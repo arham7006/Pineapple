@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For My Pineapple 🍍</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --pink: #ffafcc;
+            --dark-pink: #ff5c8a;
+            --yellow: #ffed4a;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        /* LAYER: Initial Gradient Background */
+        .gradient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--pink) 0%, #ffffff 50%, var(--yellow) 100%);
+            z-index: 1; 
+            transition: opacity 2s ease;
+        }
+
+        /* LAYER: Floating Emojis (Teleporting Layer) */
+        .bg-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 6; 
+            pointer-events: none;
+            transition: z-index 0.5s;
+        }
+
+        /* Twinkle Animation */
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; transform: scale(0.5); }
+            50% { opacity: 0.7; transform: scale(1.2); }
+        }
+
+        /* LAYER: The Cinematic Slider */
+        .photo-slider-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 300%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            z-index: 3; 
+            filter: grayscale(100%) brightness(0.6);
+            opacity: 0;
+        }
+
+        .photo-slider-bg.active {
+            opacity: 1;
+            animation: slideLeftToRight 45s linear infinite;
+        }
+
+        .slider-item {
+            height: 350px;
+            width: 600px;
+            border-radius: 20px;
+            object-fit: cover;
+            flex-shrink: 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .start-photo {
+            height: 17vw;
+            width: 13vw;
+            border-radius: 15px;
+            object-fit: cover;
+            flex-shrink: 0;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        }
+
+        @keyframes slideLeftToRight {
+            from { transform: translateX(-60%); }
+            to { transform: translateX(0%); }
+        }
+
+        /* Interaction Cards */
+        .card {
+            background: rgba(255, 255, 255, 0.96);
+            padding: 2.5rem;
+            border-radius: 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+            max-width: 380px;
+            height: 80%;
+            width: 85%;
+            border: 3px solid var(--pink);
+            position: relative;
+            z-index: 10; 
+            overflow: hidden;
+            min-height: 450px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .fade-in { animation: fadeIn 0.8s ease-in forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .btn-row { display: flex; justify-content: center; gap: 20px; margin-top: 25px; width: 100%; }
+        .btn { background: var(--dark-pink); color: white; border: 2px solid var(--dark-pink); padding: 12px 28px; border-radius: 30px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn:hover{background-color: white; color: var(--dark-pink); border: 2px solid var(--dark-pink); border-radius: 30px}
+        #noBtn { background: var(--dark-pink); transition: all 0.15s ease; position: relative; }
+        #noBtn:hover{background-color: white; color: var(--dark-pink); border: 2px solid var(--dark-pink); border-radius: 30px}
+        .hidden { display: none; opacity: 0; }
+
+        .featured-photo {
+            width: 100%;
+            height: 100%;
+            background: #fff5f8;
+            border-radius: 15px;
+            margin-top: 20px;
+            border: 2px solid var(--pink);
+            overflow: hidden;
+        }
+        .featured-photo img { width: 100%; height: 100%; object-fit: cover; }
+        .pineapple-icon { font-size: 3.5rem; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+    <audio id="bgMusic" loop>
+        <source src="regardless.mp3" type="audio/mpeg">
+    </audio>
+
+    <div id="slider" class="photo-slider-bg">
+        <img src="IMG1.jpeg" class="slider-item">
+        <video src="vid1.mp4" class="slider-item" autoplay loop muted playsinline></video>
+        <img src="img2.jpeg" class="slider-item">
+        <video src="vid2.mp4" class="slider-item" autoplay loop muted playsinline></video>
+        <img src="img3.jpeg" class="slider-item">
+        <video src="vid3.mp4" class="slider-item" autoplay loop muted playsinline></video>
+        <img src="img4.jpeg" class="slider-item">
+        <video src="vid4.mp4" class="slider-item" autoplay loop muted playsinline></video>
+        <img src="img5.jpeg" class="slider-item">
+    </div>
+
+    <div id="main-bg" class="gradient-bg"></div>
+    <div class="bg-elements" id="emoji-layer"></div>
+
+    <div id="step0" class="card fade-in">
+        <div class="pineapple-icon">✨🎁</div>
+        <h1>Are you ready for something special?</h1>
+        <img src="img2.jpeg" class="start-photo" alt="start photo">
+        <p>I have a little something for my favorite Pineapple...</p>
+        <button class="btn" onclick="startExperience()">Start ❤️</button>
+    </div>
+
+    <div id="step1" class="card hidden">
+        <div class="pineapple-icon">🍍💖</div>
+        <h1>Hi Pineapple!</h1>
+        <p>My Dearest Pineapple, I know I am away right now, and it’s tough with your birthday and Valentine’s Day both coming together. But I am so incredibly proud of the decision I made to confess my feelings to you. Before any relation, you are my best friend, and trust me, our bakchodi isn’t ending anytime soon! I love you deeply and I am missing you so much that i can't put it together in words. So now, I can't just have me missing you and to make you miss me, I’m playing our song in the background to make sure I'm on your mind... hehe 😈!! I’ll make it all up to you the very second we finally meet.</p>
+        <button style="margin-top: 20px;" class="btn" onclick="nextStep(2)">Next ❤️</button>
+    </div>
+
+    <div id="step2" class="card hidden">
+        <div class="pineapple-icon">👑🍍</div>
+        <h1>Until then...</h1>
+        <p>Would you be my valentine?</p>
+        <div class="btn-row">
+            <button class="btn" id="yesBtn" onclick="celebrate()">Yes!</button>
+            <button id="noBtn" class="btn" onmouseover="moveNo()" onclick="nextStep(4)">No</button>
+        </div>
+    </div>
+
+    <div style="margin: 10px 10px 10px 10px;" id="step3" class="card hidden">
+        <div style="margin-bottom: 0;" class="pineapple-icon">🥰✨</div>
+        <h1 style="margin: 10px 0 10px 0;">I knew it!</h1>
+        <p style="margin: 6px 0 6px 0;">You're the sweetest pineapple ever but if you tried clicking <i>"NO"</i> earlier, Only 1 time is forgiven as i know aapki <i>"Gaandmasti"</i> khatam nhi hoti. Anyways i have added a counter but if its more than 1, we are gonna have arguments and you are gonna be shut with a intense makeout session.<br>Happy Birthday and valentine baby.</p>
+        <div class="featured-photo">
+            <img src="img5.jpeg" alt="Featured Memory">
+        </div>
+        <p style="font-size: 0.9rem; margin-top: 15px; color: var(--dark-pink); font-style: italic;">Ps: I want a picture of us kissing ❤️</p>
+    </div>
+
+    <div id="step4" class="card hidden">
+        <div class="pineapple-icon">🤨🍍</div>
+        <h1>How dare you!</h1>
+        <p>This isn't an option, Pineapple! Nice try though.</p>
+        <button class="btn" onclick="resetNo()">Back to Yes ↩️</button>
+    </div>
+
+    <script>
+        let moveCount = 0;
+        const maxMoves = 5;
+        const audio = document.getElementById('bgMusic');
+
+        // Teleporting Emoji Logic
+        const emojiLayer = document.getElementById('emoji-layer');
+        const symbols = ['🍍', '💋', '💖', '✨'];
+
+        function createTwinklingEmoji() {
+            const div = document.createElement('div');
+            div.innerText = symbols[Math.floor(Math.random() * symbols.length)];
+            div.style.position = 'absolute';
+            
+            // Initial Random Position
+            setRandomPosition(div);
+            
+            div.style.fontSize = Math.random() * 20 + 20 + 'px';
+            div.style.opacity = '0';
+            
+            const duration = Math.random() * 4 + 3; // 3s to 7s cycle
+            const delay = Math.random() * 5;
+            div.style.animation = `twinkle ${duration}s ease-in-out ${delay}s infinite`;
+
+            // Magic: Teleport when animation repeats
+            div.addEventListener('animationiteration', () => {
+                setRandomPosition(div);
+            });
+
+            emojiLayer.appendChild(div);
+        }
+
+        function setRandomPosition(element) {
+            element.style.left = Math.random() * 90 + 5 + 'vw';
+            element.style.top = Math.random() * 90 + 5 + 'vh';
+        }
+
+        // Initialize 25 twinkling emojis
+        for (let i = 0; i < 50; i++) {
+            createTwinklingEmoji();
+        }
+
+        function startExperience() {
+            audio.play().catch(e => console.log("Play blocked"));
+            nextStep(1);
+        }
+
+        function nextStep(step) {
+            document.querySelectorAll('.card').forEach(c => {
+                c.classList.add('hidden');
+                c.classList.remove('fade-in');
+            });
+            const nextCard = document.getElementById('step' + step);
+            nextCard.classList.remove('hidden');
+            void nextCard.offsetWidth; 
+            nextCard.classList.add('fade-in');
+        }
+
+        function celebrate() {
+            nextStep(3);
+            document.getElementById('emoji-layer').style.zIndex = "2";
+            document.getElementById('main-bg').style.opacity = '0';
+            document.getElementById('slider').classList.add('active');
+            confetti({
+                particleCount: 180,
+                spread: 80,
+                origin: { y: 0.6 },
+                colors: ['#ffafcc', '#ffed4a', '#ffffff']
+            });
+            setTimeout(() => { audio.currentTime = 65; }, 500); 
+        }
+
+        function resetNo() {
+            moveCount = 0;
+            const noBtn = document.getElementById('noBtn');
+            noBtn.style.position = 'relative';
+            noBtn.style.left = '0';
+            noBtn.style.top = '0';
+            nextStep(2);
+        }
+
+        function moveNo() {
+            if (moveCount >= maxMoves) return;
+            const btn = document.getElementById('noBtn');
+            const card = btn.closest('.card');
+            btn.style.position = 'absolute';
+            const randomX = Math.floor(Math.random() * (card.clientWidth - btn.clientWidth - 20)) + 10;
+            const randomY = Math.floor(Math.random() * (card.clientHeight - btn.clientHeight - 20)) + 10;
+            btn.style.left = randomX + 'px';
+            btn.style.top = randomY + 'px';
+            moveCount++;
+        }
+    </script>
+</body>
+</html>
