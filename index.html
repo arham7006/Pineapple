@@ -96,10 +96,9 @@
         }
 
 @keyframes slideInfinite {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-        }
-
+    0% { transform: translateX(-50%); } /* Start halfway (showing the second set) */
+    100% { transform: translateX(0); }  /* Move to the start (showing the first set) */
+}
         /* Interaction Cards */
         .card {
             background: rgba(255, 255, 255, 0.96);
@@ -315,3 +314,4 @@
 </body>
 
 </html>
+
